@@ -1,0 +1,25 @@
+<html>
+
+<body>
+  <button onclick="moveBox()">MOVE</button>
+  <div id="my_box_realtime"
+    style="background-color: red; position: absolute; right: 70; bottom: 70; min-width: 100px; min-height: 100px">
+  </div>
+</body>
+<script type="text/javascript">
+  const my_box_realtime = document.getElementById('my_box_realtime');
+  const interval = setInterval(moveBox, 500)
+  function moveBox() {
+    let right = parseInt(my_box_realtime.style.right.slice(0, -2));
+    let bottom = parseInt(my_box_realtime.style.bottom.slice(0, -2));
+    right >= 0 && right--;
+    bottom >= 0 && bottom--;
+    my_box_realtime.style.right = right;
+    my_box_realtime.style.bottom = bottom;
+    if (right >= 0 && bottom >= 0) {
+      clearInterval(interval);
+    }
+  }
+</script>
+
+</html>

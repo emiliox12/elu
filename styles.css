@@ -1,0 +1,36 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+}
+
+.inner-container {
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+}
+
+.inner-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  text-align: center;  
+  padding-inline: 10rem;
+  height: auto;
+  min-height: 20vh;
+  flex-direction: column;
+}
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  text-align: center;  
+  padding-inline: 5rem;
+  height: auto;
+  min-height: 20vh;
+  flex-direction: column;
+
+}

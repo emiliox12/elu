@@ -1,0 +1,36 @@
+<html>
+
+<body style='background-color: black'>
+  <div id="my_bouncing_box"
+    style="background-color: blue; border-radius: 3px; position: absolute; left: 1px; top: 1px; min-width: 100px; min-height: 100px; text-align: center; font-weight: bold; color: #999;">
+    Not loaded</div>
+</body>
+<script type="text/javascript">
+  const my_bouncing_box = document.getElementById('my_bouncing_box');
+  const colours = ['blue', 'purple', 'green', 'red', 'yellow', 'aquamarine'];
+  let colour = 0;
+  let moveRight = true;
+  let moveDown = true;
+  const interval = setInterval(moveBox, 5)
+  var totalW = window.innerWidth - 100;
+  var totalH = window.innerHeight - 100;
+  function moveBox() {
+    let top = parseInt(my_bouncing_box.style.top.slice(0, -2));
+    let left = parseInt(my_bouncing_box.style.left.slice(0, -2));
+    (moveDown) ? top++ : top--;
+    (moveRight) ? left++ : left--;
+    my_bouncing_box.style.top = top;
+    my_bouncing_box.style.left = left;
+    /* console.log({ top, left, right, bottom }); */
+    if (top >= totalH || top <= 0) {
+      moveDown = !moveDown;
+      my_bouncing_box.style['background-color'] = colours[(++colour) % 6]
+    }
+    if (left >= totalW || left <= 0) {
+      moveRight = !moveRight;
+      my_bouncing_box.style['background-color'] = colours[(++colour) % 6]
+    }
+  }
+</script>
+
+</html>
