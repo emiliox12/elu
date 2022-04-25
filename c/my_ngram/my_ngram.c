@@ -2,16 +2,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#define MAX_CHARS 128
 
 void n_gram(char *string)
 {
   int resultLen = 0;
-  char *result = malloc(strlen(string) * sizeof(char));
-  int *nums = malloc(strlen(string) * sizeof(int));
+  char *result = malloc(strlen(string) > MAX_CHARS ? strlen(string) : MAX_CHARS * sizeof(char));
+  int *nums = malloc(strlen(string) > MAX_CHARS ? strlen(string) : MAX_CHARS * sizeof(int));
   for (int i = 0; i < strlen(string); i++)
   {
     bool found = false;
     char elem = string[i];
+    if (elem == '\"')
+    {
+      continue;
+    }
     for (int j = 0; j < strlen(string); j++)
     {
       char elem2 = result[j];
@@ -49,7 +54,7 @@ void n_gram(char *string)
   }
   for (int i = 0; i < resultLen; i++)
   {
-    printf("%c: %d\n", result[i], nums[i]);
+    printf("%c:%d\n", result[i], nums[i]);
   }
   free(result);
   free(nums);

@@ -2,61 +2,152 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+
+bool isDigit(char code)
+{
+  return code >= 48 && code <= 55;
+}
+
+bool checkCode(char *code, char *inputCode)
+{
+  int wellPlaced = 0;
+  int missPlaced = 0;
+  for (int i = 0; inputCode[i]; i++)
+  {
+    if (code[i] == inputCode[i])
+    {
+      wellPlaced++;
+      continue;
+    }
+    for (int j = 0; inputCode[j]; j++)
+    {
+      if (inputCode[i] == code[j])
+      {
+        missPlaced++;
+      }
+    }
+  }
+  if (wellPlaced == 4)
+  {
+    return true;
+  }
+  printf("Well placed pieces: %d\nMisplaced pieces: %d\n", wellPlaced, missPlaced);
+  return false;
+}
+
+bool validateCode(char *code)
+{
+  int i = 0;
+  while (code[i])
+  {
+    if (!isDigit(code[i]))
+    {
+      printf("Its not a valid number\n");
+      return false;
+    }
+    for (int j = 0; j < i; j++)
+    {
+      if (code[i] == code[j])
+      {
+        printf("It repeats\n");
+        return false;
+      }
+    }
+    i++;
+  }
+  if (i != 4)
+  {
+    printf("wrong Length: %d\n", i);
+    return false;
+  }
+  return true;
+}
 
 void start_game(char *code, int attempts)
 {
+  int i = 0;
+  while (i < attempts)
+  {
+    printf("---\nRound %d\n>", i);
+    char inputCode[10];
+    scanf("%s", inputCode);
+    if (!validateCode(inputCode))
+    {
+      printf("Wrong input!\n");
+      continue;
+    }
+    bool didWin = checkCode(code, inputCode);
+    if (didWin)
+    {
+      printf("Congratz! You did it!\n");
+      return;
+      ;
+    }
+    i++;
+  }
+  printf("The code was: %s\nSorry, better luck next time\n", code);
 }
 
-void createCode(char **code)
+void createCode(char **passcode)
 {
-  int array[10];
-  for (int i = 0; i < 10; i++)
-  { // fill array
-    array[i] = i;
-    printf("%d,", array[i]);
-  }
-  for (int i = 0; i < 10; i++)
-  { // shuffle array
-    int temp = array[i];
-    int randomIndex = rand() % 10;
-    array[i] = array[randomIndex];
-    array[randomIndex] = temp;
-  }
+  time_t t;
+  srand(time(&t));
+  char *code = malloc(sizeof(char) * 4);
   for (int i = 0; i < 4; i++)
   {
-    *code[i] = array[i];
+    int randomIndex = rand() % 8;
+    bool assign = true;
+    for (int j = 0; j < i; j++)
+    {
+      if (randomIndex + '0' == code[j])
+      {
+        i--;
+        assign = false;
+        break;
+      }
+    }
+    if (assign)
+    {
+      code[i] = randomIndex + '0';
+    }
   }
-  printf("code: %s\n", *code);
+  strcpy(*passcode, code);
+  free(code);
 }
 
-int main(int ac, char **av)
+int main(int _, char **av)
 {
-  char *code;
+  char *code = malloc(sizeof(char) * 4);
   int attemps = 10;
   int i = 1;
   while (av[i])
   {
-    printf("av[%d]: /%s/\n", i, av[i]);
-    printf("check: %d\n", av[i] == "-c");
-    if (av[i] == "-c")
+    if (strcmp(av[i], "-c") == 0)
     {
-      printf("Will you find the secret code?\n---\n");
-      code = av[i + 1];
+      if (!validateCode(av[i + 1]))
+      {
+        printf("Invalid Code\n");
+        return 0;
+      }
+      printf("Code received\n");
+      strcpy(code, av[i + 1]);
     }
-    else if (av[i] == "-t")
+    else if (strcmp(av[i], "-t") == 0)
     {
+      printf("Attempts received\n");
       attemps = atoi(av[i + 1]);
     }
     i++;
   }
-  printf("Will you find the secret code?\n---\n");
-  printf("code: %s\n", code);
-  printf("code: %d\n", !code);
-  if (!code)
+  printf("Will you find the secret code?\n");
+  if (strlen(code) == 0)
   {
-    printf("!code\n");
     createCode(&code);
+    // printf("Code created: %s\n", code);
   }
-  /* start_game(code, attemps); */
+  printf("Attempts: %d\n", attemps);
+  start_game(code, attemps);
+  free(code);
   return 0;
 }
