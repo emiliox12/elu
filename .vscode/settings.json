@@ -4,6 +4,10 @@
     "*.ts": "typescript",
     "stdlib.h": "c",
     "unistd.h": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "stdbool.h": "c",
+    "type_traits": "c",
+    "dirent.h": "c",
+    "stat.h": "c"
   }
 }
