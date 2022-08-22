@@ -37,6 +37,46 @@ void printList(t_list *head)
   printf("\n");
 }
 
+t_list *addElementSorted(t_list *head, int value)
+{
+  t_list *elem = (t_list *)malloc(sizeof(t_list));
+  elem->value = value;
+  if (head == NULL)
+  {
+    printList(elem);
+    return elem;
+  }
+  if (head->value < elem->value)
+  {
+    elem->next = head;
+    printList(elem);
+    return elem;
+  }
+  if (head->next == NULL)
+  {
+    head->next = elem;
+    printList(head);
+    return head;
+  }
+  t_list *curr = head->next;
+  t_list *prev = head;
+  while (curr != NULL)
+  {
+    if (curr->value < elem->value)
+    {
+      prev->next = elem;
+      elem->next = curr;
+      printList(head);
+      return head;
+    }
+    prev = curr;
+    curr = curr->next;
+  }
+  prev->next = elem;
+  printList(head);
+  return head;
+}
+
 t_list *mergeList(t_list *list_a, t_list *list_b)
 {
   t_list *head = NULL;
@@ -71,18 +111,14 @@ t_list *mergeList(t_list *list_a, t_list *list_b)
 int main()
 {
   t_list *List1 = NULL;
-  t_list *List2 = NULL;
-  List1 = newElem(List1, 1);
-  newElem(List1, 2);
-  newElem(List1, 4);
-
-  List2 = newElem(List2, 1);
-  newElem(List2, 3);
-  newElem(List2, 4);
-  printList(List2);
+  List1 = addElementSorted(List1, 11);
+  List1 = addElementSorted(List1, 10);
+  List1 = addElementSorted(List1, 8);
+  List1 = addElementSorted(List1, 6);
+  List1 = addElementSorted(List1, 1);
+  List1 = addElementSorted(List1, 2);
+  printf("\033[0;35m");
   printList(List1);
-
-  t_list *newLst = mergeList(List1, List2);
-  printList(newLst);
+  printf("\033[0m");
   return 0;
 }

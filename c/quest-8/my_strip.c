@@ -31,16 +31,19 @@ char *my_strip(char *param_1)
       resPos++;
     }
   }
+  resPos--;
   while (res[resPos] == ' ' || res[resPos] == '\t')
   {
     resPos--;
   }
-  res[resPos - 1] = '\0';
+  res[resPos + 1] = '\0';
   return res;
 }
 
 int main(int argc, char const *argv[])
 {
-  printf("%s", my_strip("No  S***    Sherlock..."));
+  printf("*%s*\n", my_strip("No  S***    Sherlock..."));
+  printf("*%s*\n", my_strip("See? It's easy to print the same thing"));
+  printf("*%s*\n", my_strip(" this        time it      will     be    more complex  . "));
   return 0;
 }

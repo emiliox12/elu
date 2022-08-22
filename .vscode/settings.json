@@ -8,6 +8,7 @@
     "stdbool.h": "c",
     "type_traits": "c",
     "dirent.h": "c",
-    "stat.h": "c"
+    "stat.h": "c",
+    "main.h": "c"
   }
 }

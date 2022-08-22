@@ -5,6 +5,8 @@ const songs = require('./data.json')
 const app = express()
 var router = express.Router()
 
+app.use(express.json())
+
 router.use(basicAuth({
     users: { 'admin': 'admin' }
 }));
@@ -45,6 +47,10 @@ app.get('/public', function (req, res) {
 
 router.get('/protected', function (req, res) {
   console.log("Welcome, authenticated client")
+})
+
+app.post('/mirror', function (req, res) {
+  res.json(req.body);
 })
 
 app.use(router);

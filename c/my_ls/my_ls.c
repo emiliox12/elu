@@ -1,6 +1,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -9,20 +10,33 @@
 #define STRUCT_LISTNODE
 typedef struct s_listnode
 {
-  __time_t time;
+  long time;
   char *name;
+  int type;
   struct s_listnode *next;
 } listnode;
 #endif
+
+int getTypeColor(int type)
+{
+  switch (type)
+  {
+  case 4:
+    return 35;
+  case 8:
+    return 36;
+  case 9:
+    return 32;
+  default:
+    return 37;
+  }
+}
 
 void printList(listnode *curr)
 {
   while (curr != NULL)
   {
-    char buff[20];
-    time_t now = time(NULL);
-    strftime(buff, 20, "%Y-%m-%d %H:%M:%S", localtime(&curr->time));
-    printf("%s: %s\n", curr->name, buff);
+    printf("\033[0;%dm%s\033[0m\n", getTypeColor(curr->type), curr->name);
     curr = curr->next;
   }
   printf("\n");
@@ -61,7 +75,7 @@ listnode *addElementSorted(listnode *head, listnode *elem)
   }
   listnode *curr = head->next;
   listnode *prev = head;
-  while (curr->next != NULL)
+  while (curr != NULL)
   {
     if (curr->time < elem->time)
     {
@@ -69,42 +83,90 @@ listnode *addElementSorted(listnode *head, listnode *elem)
       elem->next = curr;
       return head;
     }
+    else if (curr->time == elem->time)
+    {
+      char *elemName = (elem->name[0] == '.') ? elem->name + 1 : elem->name;
+      char *currName = (curr->name[0] == '.') ? curr->name + 1 : curr->name;
+      int compare = strcmp(elemName, currName);
+      if (compare < 0)
+      {
+        prev->next = elem;
+        elem->next = curr;
+        return head;
+      }
+    }
+    prev = curr;
     curr = curr->next;
   }
-  curr->next = elem;
+  prev->next = elem;
   return head;
 }
 
 int main(int argc, char const *argv[])
 {
   struct dirent *dp;
-  struct dirent *result;
   struct stat attr;
-  bool isSorted = true;
-  bool showHidden = true;
-  DIR *directory = opendir(argv[1]);
-  listnode *head = (listnode *)malloc(sizeof(listnode));
-  head = NULL;
-  while ((dp = readdir(directory)) != NULL)
+  bool isSorted = false;
+  bool showHidden = false;
+  int i = 1;
+  while (argv[i] && argv[i][0] == '-')
   {
-    if (showHidden || !(dp->d_name[0] == '.'))
+    if (strcmp(argv[i], "-at") == 0 || strcmp(argv[i], "-ta") == 0)
     {
-      stat(dp->d_name, &attr);
-      listnode *elem = (listnode *)malloc(sizeof(listnode));
-      elem->time = attr.st_mtim.tv_sec;
-      elem->name = dp->d_name;
-      elem->next = NULL;
-      /* printf("%s, %ld\n", elem->name, elem->time); */
-      if (isSorted)
+      isSorted = true;
+      showHidden = true;
+    }
+    else if (strcmp(argv[i], "-t") == 0)
+    {
+      isSorted = true;
+    }
+    else if (strcmp(argv[i], "-a") == 0)
+    {
+      showHidden = true;
+    }
+    i++;
+  }
+  if (!argv[i])
+  {
+    argv[i] = ".";
+    argc++;
+  }
+  while (i < argc)
+  {
+    DIR *directory = opendir(argv[i]);
+    if (directory == NULL)
+    {
+      printf("Directory might not exist or can not be accessed\n");
+      return 0;
+    }
+    listnode *head = (listnode *)malloc(sizeof(listnode));
+    head = NULL;
+    while ((dp = readdir(directory)) != NULL)
+    {
+      if (showHidden || !(dp->d_name[0] == '.'))
       {
-        head = addElementSorted(head, elem);
-      }
-      else
-      {
-        head = addElementLast(head, elem);
+        char dirPath[50];
+        strcpy(dirPath, argv[argc - 1]);
+        lstat(strcat(dirPath, dp->d_name), &attr);
+        listnode *elem = (listnode *)malloc(sizeof(listnode));
+        elem->time = attr.st_mtim.tv_sec;
+        elem->name = dp->d_name;
+        elem->type = (dp->d_name[0] == '.') ? 9 : dp->d_type;
+        elem->next = NULL;
+        if (isSorted)
+        {
+          head = addElementSorted(head, elem);
+        }
+        else
+        {
+          head = addElementLast(head, elem);
+        }
       }
     }
+    closedir(directory);
+    printList(head);
+    printf("\n\n");
+    i++;
   }
-  printList(head);
   return 0;
 }
